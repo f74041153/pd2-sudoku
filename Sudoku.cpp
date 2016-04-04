@@ -237,7 +237,7 @@ bool Sudoku::unsolveable1()//某格不能填任何數字
         n=0;
         for(j=0;j<9;j++)
            {
-             if(compare[j]==0)possible_answer[n++]=j+1;
+             if(compare[j]==0)possible_answer[n++]=j+1;//找出此行剩餘數字
             }
         n=0;
         for(j=i;j<i+9;j++)
@@ -248,16 +248,14 @@ bool Sudoku::unsolveable1()//某格不能填任何數字
            {
              if(zero_site[j]!=0&&possible_answer[m]!=0)
              {
-			    if(suitable_site(zero_site[j]-1,possible_answer[m])==1)break;
-		        if(suitable_site(zero_site[j]-1,possible_answer[m])==0&&(j<8&&zero_site[j+1]==0))//一整行都無合適的位置 
+			if(suitable_site(zero_site[j]-1,possible_answer[m])==1)break;//此數字找到可填位置
+		        if(suitable_site(zero_site[j]-1,possible_answer[m])==0&&(j<8&&zero_site[j+1]==0))//一整行到底都無合適的位置 
 			    {
-			        cout<<"row1";
-                    return true;
+			         return true;
 			    } 
 			    if(suitable_site(zero_site[j]-1,possible_answer[m])==0&&j==8)
 			    {
-			 	    cout<<"row2";
-                    return true;
+                               return true;
 			    }
 			 }
 		   }           
@@ -314,7 +312,7 @@ bool Sudoku::unsolveable1()//某格不能填任何數字
 
     }
   }
-   for(i=0;i<9;i++)//team
+   for(i=0;i<9;i++)//team宮
    {
      for(a=0;a<9;a++)
      {
@@ -350,13 +348,11 @@ bool Sudoku::unsolveable1()//某格不能填任何數字
             if(suitable_site(zero_site[j]-1,possible_answer[a])==1)break;
 		    if((j<8&&zero_site[j+1]==0)&&suitable_site(zero_site[j]-1,possible_answer[a])==0)
 			{
-			   cout<<"team1";
-               return true;
+			    return true;
 			}
 			if(suitable_site(zero_site[j]-1,possible_answer[a])==0&&j==8)
 			{
-			    cout<<"team2";
-                return true;
+			   return true;
 			}
          }
        }
@@ -392,16 +388,16 @@ bool Sudoku::unsolveable3()//本身題目有問題
     }
  	for(int i=0;i<81;i++)
  	{
-      if(rdinmp[i]!=0)
+      if(rdinmp[i]!=0)//計算數字在某行某列某格出現次數    
 	  {
 	    compare_row[i/9][rdinmp[i]-1]++;
 	    compare_col[i%9][rdinmp[i]-1]++;
 	    compare_team[3*(i/27)+(i%9)/3][rdinmp[i]-1]++;
-      }
+          }
 	} 
     for(int i=0;i<9;i++)
 	{
-	  for(int j=0;j<9;j++)
+	  for(int j=0;j<9;j++)//出現數字重複了
 	  {
 	  	if(compare_row[i][j]>1||compare_col[i][j]>1||compare_team[i][j]>1)return true;
 	  }
@@ -430,10 +426,10 @@ int Sudoku::one_number_rest(int arr[9])//唯一法
               rest[x++]=i+1;   //紀錄未填數字
         }
     }
-    if(k==1)return rest[0];
+    if(k==1)return rest[0];   //剩下的那個未填數字
     else return 0;
 }
-void Sudoku::scan_row(int row)//唯一法
+void Sudoku::scan_row(int row)//唯一法//剩一格直接填
 {
    int i,compare[9],k=0,zero_site[9],x=0;
    for(i=9*row;i<9*row+9;i++)
@@ -480,7 +476,7 @@ void Sudoku::scan_team()//唯一法
        if(x==1){rdinmp[zero_site[0]]=one_number_rest(compare);}//只剩一個空格直接填
     }
 }
-void Sudoku::row_col_team()//數對唯餘法
+void Sudoku::row_col_team()//數對唯餘法//行列宮交差點若剩餘唯一數字直接填
 {
     int i,zero_site[81],a=0,j,site,k,compare[9],answer[9];
     for(i=0;i<81;i++)
@@ -561,7 +557,7 @@ void Sudoku::row_col_team()//數對唯餘法
    }
 
 }
-bool Sudoku::check_blank_space()
+bool Sudoku::check_blank_space()//還有空位
 {
    for(int i=0;i<81;i++)
    {
@@ -595,7 +591,7 @@ void Sudoku::try_to_fill()//列屏除
       }
       for(j=0;j<9;j++)
       {
-        if(compare[j]==0)possible_answer[m++]=j+1;
+        if(compare[j]==0)possible_answer[m++]=j+1;//可能答案
       }
       for(n=0;n<9;n++)
       {
@@ -613,7 +609,7 @@ void Sudoku::try_to_fill()//列屏除
             suit=suit+suitable_site(zero_site[j]-1,possible_answer[n]);
           }
         }
-        if(suit==1)
+        if(suit==1)//此數字在此行出現的位置唯一!!!
         {
            for(j=0;j<9;j++)
            {
@@ -674,30 +670,29 @@ void Sudoku::try_to_fill_col()//行屏除
     }
   }
 }
-bool Sudoku::count(int arr[],int possible_answer)
+bool Sudoku::count(int arr[],int possible_answer)//傳入的此數字在此陣列中是否為可填數字
 {
    int counter[9];
    for(int i=0;i<9;i++)counter[i]=0;
    for(int i=0;i<9;i++)++counter[arr[i]-1];
    if(possible_answer!=0&&counter[possible_answer-1]==0)return true;
-
    return false;
 }
 int Sudoku::suitable_site(int zero_site,int possible_answer)
 {
    int arr[9],site,k,j,i;
-   for(j=0;j<9;j++)
+   for(j=0;j<9;j++)//判斷行可填
    {
        arr[j]=rdinmp[(zero_site-zero_site%9)+j];
    }
    if(count(arr,possible_answer)==false)return 0;
-   for(j=0;j<9;j++)
+   for(j=0;j<9;j++)//判斷列可填
    {
        arr[j]=rdinmp[(zero_site%9)+9*j];
    }
    if(count(arr,possible_answer)==false)return 0;
    k=0;
-   for(j=zero_site-(zero_site%3)-9*((zero_site/9)%3);j<=zero_site-(zero_site%3)-9*((zero_site/9)%3)+18;j=j+9)
+   for(j=zero_site-(zero_site%3)-9*((zero_site/9)%3);j<=zero_site-(zero_site%3)-9*((zero_site/9)%3)+18;j=j+9)//判斷宮可填
    {
       for(i=0;i<3;i++)
       {
@@ -747,7 +742,7 @@ void Sudoku::try_to_fill_team()//宮屏除
           suit=suit+suitable_site(zero_site[j]-1,possible_answer[a]);
         }
        }
-       if(suit==1)
+       if(suit==1)//此數字在此宮可填位置唯一
        {
          for(j=0;j<9;j++)
          {
@@ -758,7 +753,7 @@ void Sudoku::try_to_fill_team()//宮屏除
     }
   }
 } 
-void Sudoku::team_one_possible()
+void Sudoku::team_one_possible()//此位子可填數唯一
 {
   int i,a,n,k,j,m,exist_number[9],zero_site[9],possible_answer[9],compare[9],suit;
   for(i=0;i<9;i++)
@@ -809,7 +804,7 @@ void Sudoku::team_one_possible()
     }
   }
 }
-void Sudoku::color()
+void Sudoku::color()//若候補數都在同行 鄰宮的此行候補數取消
 {
   int i,a,j,n,k,u,p,answer[81][9],zero_site[81],temp[81],count_row[9],two_way[9],count_team[9],count_col[9];
     for(i=0;i<81;i++)
@@ -1030,11 +1025,7 @@ void Sudoku::too_many_answer()
       cout<<"0"<<endl;
       exit(0);
     } 
-    for(i=0;i<81;i++)
-    {
-       temp[i]=rdinmp[i];
-    }
-   for(j=0;j<10;j++)
+    for(j=0;j<10;j++)
    { 
   	 for(i=0;i<9;i++)
      {
@@ -1072,12 +1063,12 @@ void Sudoku::too_many_answer()
 		} 
 		exit(0);
 	 }
-   	if(unsolveable1())
+   	if(unsolveable1())//在判斷一次是否無解
 	{
-	  cout<<"02"<<endl;
+	  cout<<"0"<<endl;
  	  exit(0);
     }
-    cout<<"2"<<endl;
+    cout<<"2"<<endl;//排除無解唯一解即多解
     exit(0);
       
 }
